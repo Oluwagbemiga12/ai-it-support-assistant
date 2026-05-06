@@ -1,0 +1,174 @@
+{
+  "name": "IT SUPPORT SYSTEM",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nI am your IT Support Assistant. I can help you with:\n• Password resets\n• VPN setup\n• Email issues\n• Printer problems\n• Software installation\n• Access requests\n\nHow can I help you today?",
+        "availableInChat": true,
+        "agentIcon": {
+          "type": "icon",
+          "value": "headset"
+        },
+        "agentName": "IT Support Bot",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        288,
+        0
+      ],
+      "id": "261ee04a-4695-4d1a-bec3-9f86b5efd5eb",
+      "name": "When chat message received",
+      "webhookId": "b567d98b-aabb-4963-b0f8-6b1e8b5f8959"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        224
+      ],
+      "id": "201ee441-da46-49fc-befa-312ad4b60479",
+      "name": "OpenAI Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZSxNBnWt8adOejlx",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        224
+      ],
+      "id": "aa874554-17b1-41a1-9e1f-8c6c197e7e2f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=IT Support Assistant\n\n# Role\n\nYou are a helpful IT support assistant for a company. You have access to:\n\n* **Calculator** - for any calculations needed\n* **Knowledge Base** - searchable database of common IT issues and solutions\n\nYou provide clear, step-by-step technical support.\n\n# Behavior\n\n* Greet users warmly and ask how you can help with their IT issue\n* **Always search the Knowledge Base first** when users describe a problem\n* Provide clear, numbered step-by-step instructions\n* If the Knowledge Base has a solution, present it in an easy-to-follow format\n* If no solution is found, gather details (OS, error messages, when it started) and advise creating a support ticket\n* Be patient and use non-technical language when possible\n* Confirm if the solution worked before closing the conversation\n\n# Common Issues You Can Help With\n\n* Password resets\n* VPN connection problems\n* Email configuration issues\n* Printer troubleshooting\n* Software installation requests\n* Slow computer performance\n* WiFi connectivity\n* Access requests to systems/folders\n\n# Response Format\n\n* Keep responses concise but complete\n* Use numbered lists for multi-step instructions\n* Use bullet points for options or checks\n* Include relevant warnings (e.g., \"This will log you out\")\n* End with \"Did this solve your issue?\" or \"Do you need further assistance?\"\n\n# Escalation\n\nIf the issue is complex or not in the knowledge base, say:\n\"This issue requires direct IT support. Please submit a ticket at [support portal] or call the IT helpdesk at ext. 5555. Include [specific details needed].\"\n\n# Tone\n\nFriendly, professional, patient, and reassuring.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        640,
+        0
+      ],
+      "id": "e481d1a1-3a3d-4583-98ae-87a9b39471a8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "id": "1b456be0-c103-4b7b-8e81-eae91abb0d04",
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        768,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "description": "Search IT support knowledge base for common issues and solutions",
+        "jsCode": "const query = $input.query.toLowerCase();\n\nconst kb = {\n  \"password reset\": \"To reset password: 1) Go to login page 2) Click Forgot Password 3) Enter email 4) Check inbox for reset link 5) Create new password\",\n  \"vpn\": \"VPN Setup: 1) Download Cisco AnyConnect 2) Install application 3) Connect to vpn.company.com 4) Enter your credentials 5) Contact IT if connection fails\",\n  \"email\": \"Email issues: 1) Check internet connection 2) Verify credentials 3) Clear browser cache 4) Try webmail at mail.company.com 5) Contact IT if problem persists\",\n  \"printer\": \"Printer troubleshooting: 1) Check power and connections 2) Restart printer 3) Remove and re-add printer in settings 4) Update printer drivers 5) Submit ticket if unresolved\",\n  \"software install\": \"Software installation: Submit request via IT portal with software name and business justification. Approval required from manager. Installation within 2 business days.\",\n  \"slow computer\": \"Slow performance: 1) Restart computer 2) Close unused applications 3) Check disk space (need 20% free) 4) Run antivirus scan 5) Contact IT if issue continues\",\n  \"wifi\": \"WiFi issues: 1) Toggle WiFi off/on 2) Forget and reconnect to network 3) Restart device 4) Check if others have same issue 5) Contact IT for network problems\",\n  \"access request\": \"Access requests: Submit via IT portal specifying system/folder needed and business reason. Manager approval required. Access granted within 1 business day.\"\n};\n\nfor (const [key, value] of Object.entries(kb)) {\n  if (query.includes(key)) {\n    return value;\n  }\n}\n\nreturn \"No matching knowledge base article found. Please describe your issue in detail or contact IT support directly.\";"
+      },
+      "id": "9a3bab13-11ea-432a-948a-070629346143",
+      "name": "Knowledge Base",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        224
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b7f74ac6-7d2e-4ddd-b6d5-008415031f3a",
+  "meta": {
+    "templateId": "ready-to-run-ai-workflow-v5",
+    "instanceId": "67572f1f6a0a41edf44d474c7bc37708d7f4b6965cae2fbe9a349fb81ff242de"
+  },
+  "id": "s7x3qGPcgA4I4NsA",
+  "tags": []
+}
